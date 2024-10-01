@@ -29,15 +29,20 @@ public class RestaurantController {
     // Create a new restaurant
     @PostMapping
     public Restaurant createRestaurant(@RequestBody Restaurant restaurant) {
-        // Optionally calculate the overall score before saving
-        // restaurant.setOverallScore(calculateOverallScore(restaurant));
+        // Check for duplicate restaurant based on name and zip code
+        boolean exists = restaurantRepository.existsByNameAndZipCode(restaurant.getName(), restaurant.getZipCode());
+        if (exists) {
+            throw new RuntimeException("Restaurant with the same name and zip code already exists");
+        }
+
         return restaurantRepository.save(restaurant);
     }
 
     // Update an existing restaurant
     @PutMapping("/{id}")
     public Restaurant updateRestaurant(@PathVariable Long id, @RequestBody Restaurant updatedRestaurant) {
-        Restaurant restaurant = restaurantRepository.findById(id).orElseThrow(() -> new RuntimeException("Restaurant not found"));
+        Restaurant restaurant = restaurantRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
 
         // Update restaurant details
         restaurant.setName(updatedRestaurant.getName());
@@ -46,9 +51,6 @@ public class RestaurantController {
         restaurant.setDairyScore(updatedRestaurant.getDairyScore());
         restaurant.setOverallScore(updatedRestaurant.getOverallScore()); // Ensure this field is updated
 
-        // Optionally calculate the overall score here as well
-        // restaurant.setOverallScore(calculateOverallScore(restaurant));
-
         return restaurantRepository.save(restaurant);
     }
 
@@ -56,6 +58,12 @@ public class RestaurantController {
     @DeleteMapping("/{id}")
     public void deleteRestaurant(@PathVariable Long id) {
         restaurantRepository.deleteById(id);
+    }
+
+    // Fetch restaurants by zip code with allergy scores in descending order
+    @GetMapping("/zip/{zipCode}")
+    public List<Restaurant> getRestaurantsByZipCodeWithScores(@PathVariable String zipCode) {
+        return restaurantRepository.findByZipCodeAndAllergyScoresPresent(zipCode);
     }
 
     // Optional: Helper method to calculate the overall score
@@ -67,4 +75,3 @@ public class RestaurantController {
         return (peanutScore + eggScore + dairyScore) / 3;
     }
 }
-
