@@ -1,7 +1,10 @@
 package com.example.diningApi.service;
 
+import com.example.diningApi.model.DiningReview;
 import com.example.diningApi.model.Restaurant;
+import com.example.diningApi.repository.DiningReviewRepository;
 import com.example.diningApi.repository.RestaurantRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
@@ -11,13 +14,13 @@ import java.util.Optional;
 @Service
 public class RestaurantService {
 
-    private final RestaurantRepository restaurantRepository;
+    @Autowired
+    private RestaurantRepository restaurantRepository;
+
+    @Autowired
+    private DiningReviewRepository diningReviewRepository;
 
     private final DecimalFormat decimalFormat = new DecimalFormat("#.00");
-
-    public RestaurantService(RestaurantRepository restaurantRepository) {
-        this.restaurantRepository = restaurantRepository;
-    }
 
     // Get all restaurants
     public List<Restaurant> getAllRestaurants() {
@@ -73,6 +76,46 @@ public class RestaurantService {
         }
     }
 
+    // Recompute restaurant scores based on approved reviews
+    public void recalculateRestaurantScore(Long restaurantId) {
+        Optional<Restaurant> restaurantOpt = restaurantRepository.findById(restaurantId);
+        if (restaurantOpt.isPresent()) {
+            Restaurant restaurant = restaurantOpt.get();
+            List<DiningReview> approvedReviews = diningReviewRepository.findApprovedReviewsByRestaurantId(restaurantId);
+
+            double peanutScoreSum = 0.0;
+            double eggScoreSum = 0.0;
+            double dairyScoreSum = 0.0;
+
+            int reviewCount = approvedReviews.size();
+
+            if (reviewCount > 0) {
+                for (DiningReview review : approvedReviews) {
+                    peanutScoreSum += review.getPeanutScore() != null ? review.getPeanutScore() : 0.0;
+                    eggScoreSum += review.getEggScore() != null ? review.getEggScore() : 0.0;
+                    dairyScoreSum += review.getDairyScore() != null ? review.getDairyScore() : 0.0;
+                }
+
+                restaurant.setPeanutScore(peanutScoreSum / reviewCount);
+                restaurant.setEggScore(eggScoreSum / reviewCount);
+                restaurant.setDairyScore(dairyScoreSum / reviewCount);
+
+                double overallScore = (peanutScoreSum + eggScoreSum + dairyScoreSum) / (3 * reviewCount);
+                restaurant.setOverallScore(overallScore);
+            } else {
+                restaurant.setPeanutScore(null);
+                restaurant.setEggScore(null);
+                restaurant.setDairyScore(null);
+                restaurant.setOverallScore(null);
+            }
+
+            formatRestaurantScores(restaurant);
+            restaurantRepository.save(restaurant);
+        } else {
+            throw new RuntimeException("Restaurant not found");
+        }
+    }
+
     // Format the scores to two decimal places
     private Restaurant formatRestaurantScores(Restaurant restaurant) {
         restaurant.setPeanutScore(formatScore(restaurant.getPeanutScore()));
@@ -95,4 +138,5 @@ public class RestaurantService {
         return score == null ? null : Double.valueOf(decimalFormat.format(score));
     }
 }
+
 

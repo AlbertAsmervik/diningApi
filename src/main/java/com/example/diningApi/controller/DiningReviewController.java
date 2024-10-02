@@ -1,10 +1,11 @@
 package com.example.diningApi.controller;
 
 import com.example.diningApi.model.DiningReview;
-import com.example.diningApi.model.Restaurant;
 import com.example.diningApi.model.ReviewStatus;
 import com.example.diningApi.repository.DiningReviewRepository;
 import com.example.diningApi.repository.RestaurantRepository;
+import com.example.diningApi.model.Restaurant;
+import com.example.diningApi.service.RestaurantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/dining-reviews")
+@RequestMapping("/admin/dining-reviews")
 public class DiningReviewController {
 
     @Autowired
@@ -20,6 +21,9 @@ public class DiningReviewController {
 
     @Autowired
     private RestaurantRepository restaurantRepository;
+
+    @Autowired
+    private RestaurantService restaurantService;
 
     // Submit a dining review (registered user)
     @PostMapping
@@ -40,7 +44,13 @@ public class DiningReviewController {
         if (reviewOpt.isPresent()) {
             DiningReview review = reviewOpt.get();
             review.setStatus(approve ? ReviewStatus.APPROVED : ReviewStatus.REJECTED);
-            return diningReviewRepository.save(review);
+            diningReviewRepository.save(review);
+
+            // Recompute the restaurant score when a review is approved
+            if (approve) {
+                restaurantService.recalculateRestaurantScore(review.getRestaurant().getId());
+            }
+            return review;
         } else {
             throw new RuntimeException("Review not found");
         }
