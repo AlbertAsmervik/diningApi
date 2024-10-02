@@ -9,54 +9,53 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/customers") // Update the request mapping to match "Customer"
-public class CustomerController { // Update class name to "CustomerController"
+@RequestMapping("/customers")
+public class CustomerController {
 
     @Autowired
-    private CustomerRepository CustomerRepository; // Update the repository type
+    private CustomerRepository customerRepository;
 
     // Get all customers
     @GetMapping
     public List<Customer> getAllCustomers() {
-        return CustomerRepository.findAll();
+        return customerRepository.findAll();
     }
 
-    // Get a single customer by id
-    @GetMapping("/{id}")
-    public Optional<Customer> getCustomerById(@PathVariable Long id) {
-        return CustomerRepository.findById(id);
+    // Get a single customer by displayName
+    @GetMapping("/{displayName}")
+    public Optional<Customer> getCustomerByDisplayName(@PathVariable String displayName) {
+        return customerRepository.findByDisplayName(displayName);
     }
 
     // Create a new customer
     @PostMapping
-    public Customer createCustomer(@RequestBody Customer Customer) {
-        return CustomerRepository.save(Customer);
+    public Customer createCustomer(@RequestBody Customer customer) {
+        return customerRepository.save(customer);
     }
 
-    // Update an existing customer
-    @PutMapping("/{id}")
-    public Customer updateCustomer(@PathVariable Long id, @RequestBody Customer CustomerDetails) {
-        return CustomerRepository.findById(id)
-                .map(Customer -> {
-                    Customer.setDisplayName(CustomerDetails.getDisplayName());
-                    Customer.setCity(CustomerDetails.getCity());
-                    Customer.setState(CustomerDetails.getState());
-                    Customer.setZipcode(CustomerDetails.getZipcode());
-                    Customer.setInterestedInPeanutAllergies(CustomerDetails.getInterestedInPeanutAllergies());
-                    Customer.setInterestedInEggAllergies(CustomerDetails.getInterestedInEggAllergies());
-                    Customer.setInterestedInDairyAllergies(CustomerDetails.getInterestedInDairyAllergies());
-                    return CustomerRepository.save(Customer);
+    // Update an existing customer by displayName
+    @PutMapping("/{displayName}")
+    public Customer updateCustomer(@PathVariable String displayName, @RequestBody Customer customerDetails) {
+        return customerRepository.findByDisplayName(displayName)
+                .map(customer -> {
+                    customer.setCity(customerDetails.getCity());
+                    customer.setState(customerDetails.getState());
+                    customer.setZipcode(customerDetails.getZipcode());
+                    customer.setInterestedInPeanutAllergies(customerDetails.getInterestedInPeanutAllergies());
+                    customer.setInterestedInEggAllergies(customerDetails.getInterestedInEggAllergies());
+                    customer.setInterestedInDairyAllergies(customerDetails.getInterestedInDairyAllergies());
+                    return customerRepository.save(customer);
                 })
-                .orElseGet(() -> {
-                    CustomerDetails.setId(id);
-                    return CustomerRepository.save(CustomerDetails);
-                });
+                .orElseThrow(() -> new RuntimeException("Customer not found with displayName: " + displayName));
     }
 
-    // Delete a customer
-    @DeleteMapping("/{id}")
-    public void deleteCustomer(@PathVariable Long id) {
-        CustomerRepository.deleteById(id);
+    // Delete a customer by displayName
+    @DeleteMapping("/{displayName}")
+    public void deleteCustomer(@PathVariable String displayName) {
+        customerRepository.findByDisplayName(displayName)
+                .ifPresent(customer -> customerRepository.delete(customer));
     }
 }
+
+
 
