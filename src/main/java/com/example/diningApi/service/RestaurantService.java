@@ -137,6 +137,10 @@ public class RestaurantService {
     private Double formatScore(Double score) {
         return score == null ? null : Double.valueOf(decimalFormat.format(score));
     }
+
+    public boolean existsById(Long id) {
+        return restaurantRepository.existsById(id);
+    }
 }
 
 

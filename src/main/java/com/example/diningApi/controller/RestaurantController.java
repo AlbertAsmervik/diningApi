@@ -23,6 +23,7 @@ public class RestaurantController {
     // Get a restaurant by ID
     @GetMapping("/{id}")
     public Restaurant getRestaurantById(@PathVariable Long id) {
+        // Validation: Check if the restaurant exists
         return restaurantService.getRestaurantById(id);
     }
 
@@ -35,12 +36,22 @@ public class RestaurantController {
     // Update an existing restaurant
     @PutMapping("/{id}")
     public Restaurant updateRestaurant(@PathVariable Long id, @RequestBody Restaurant updatedRestaurant) {
+        // Validation: Check if the restaurant exists
+        if (!restaurantService.existsById(id)) {
+            throw new RuntimeException("Restaurant not found.");
+        }
+
         return restaurantService.updateRestaurant(id, updatedRestaurant);
     }
 
     // Delete a restaurant by ID
     @DeleteMapping("/{id}")
     public void deleteRestaurant(@PathVariable Long id) {
+        // Validation: Check if the restaurant exists before deletion
+        if (!restaurantService.existsById(id)) {
+            throw new RuntimeException("Restaurant not found.");
+        }
+
         restaurantService.deleteRestaurant(id);
     }
 

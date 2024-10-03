@@ -28,6 +28,12 @@ public class DiningReviewController {
     // Submit a dining review (registered user)
     @PostMapping
     public DiningReview submitReview(@RequestBody DiningReview diningReview) {
+        // Validation: Check if the restaurant exists
+        Optional<Restaurant> restaurantOpt = restaurantRepository.findById(diningReview.getRestaurant().getId());
+        if (!restaurantOpt.isPresent()) {
+            throw new RuntimeException("Restaurant does not exist.");
+        }
+
         return diningReviewRepository.save(diningReview);
     }
 
@@ -59,6 +65,11 @@ public class DiningReviewController {
     // Fetch all approved dining reviews for a specific restaurant
     @GetMapping("/restaurant/{restaurantId}")
     public List<DiningReview> getApprovedReviewsForRestaurant(@PathVariable Long restaurantId) {
+        // Validation: Check if the restaurant exists
+        if (!restaurantRepository.existsById(restaurantId)) {
+            throw new RuntimeException("Restaurant not found.");
+        }
+
         return diningReviewRepository.findApprovedReviewsByRestaurantId(restaurantId);
     }
 }
