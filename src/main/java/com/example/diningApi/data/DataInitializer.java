@@ -29,7 +29,7 @@ public class DataInitializer implements CommandLineRunner {
         restaurant1.setPeanutScore(4.5);
         restaurant1.setEggScore(4.0);
         restaurant1.setDairyScore(5.0);
-        restaurant1.setOverallScore(4.8);
+        restaurant1.setOverallScore(null);
 
         Restaurant restaurant2 = new Restaurant();
         restaurant2.setName("Burger Haven");
@@ -37,7 +37,7 @@ public class DataInitializer implements CommandLineRunner {
         restaurant2.setPeanutScore(3.0);
         restaurant2.setEggScore(3.5);
         restaurant2.setDairyScore(4.0);
-        restaurant2.setOverallScore(3.8);
+        restaurant2.setOverallScore(null);
 
         restaurantRepository.save(restaurant1);
         restaurantRepository.save(restaurant2);
