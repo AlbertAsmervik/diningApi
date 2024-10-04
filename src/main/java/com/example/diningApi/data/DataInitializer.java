@@ -1,5 +1,6 @@
 package com.example.diningApi.data;
-
+// this whole initilaizer is kinda reluctant, in the way that it sets all the values so the other
+// components are useless
 import com.example.diningApi.model.*;
 import com.example.diningApi.repository.RestaurantRepository;
 import com.example.diningApi.repository.DiningReviewRepository;
