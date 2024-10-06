@@ -23,7 +23,6 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Adding Dummy Restaurants
         Restaurant restaurant1 = new Restaurant();
         restaurant1.setName("The Vegan Spot");
         restaurant1.setZipCode("12345");
