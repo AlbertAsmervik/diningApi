@@ -39,8 +39,17 @@ public class DataInitializer implements CommandLineRunner {
         restaurant2.setDairyScore(4.0);
         restaurant2.setOverallScore(null);
 
+        Restaurant restaurant3 = new Restaurant();
+        restaurant2.setName("Burger Maven");
+        restaurant2.setZipCode("32323");
+        restaurant2.setPeanutScore(3.0);
+        restaurant2.setEggScore(3.5);
+        restaurant2.setDairyScore(4.0);
+        restaurant2.setOverallScore(null);
+
         restaurantRepository.save(restaurant1);
         restaurantRepository.save(restaurant2);
+        restaurantRepository.save(restaurant3);
 
         // Adding Dummy Customers
         Customer customer1 = new Customer();
@@ -64,7 +73,7 @@ public class DataInitializer implements CommandLineRunner {
         customerRepository.save(customer1);
         customerRepository.save(customer2);
 
-        // Adding Dummy Dining Reviews
+
         DiningReview review1 = new DiningReview();
         review1.setDisplayName("JohnDoe");
         review1.setRestaurant(restaurant1);
@@ -83,7 +92,17 @@ public class DataInitializer implements CommandLineRunner {
         review2.setCommentary("Food was decent, but could improve allergy options.");
         review2.setStatus(ReviewStatus.PENDING);
 
+        DiningReview review3 = new DiningReview();
+        review2.setDisplayName("Markus");
+        review2.setRestaurant(restaurant3);
+        review2.setPeanutScore(2);
+        review2.setEggScore(1);
+        review2.setDairyScore(2);
+        review2.setCommentary("Food was bland.");
+        review2.setStatus(ReviewStatus.PENDING);
+
         diningReviewRepository.save(review1);
         diningReviewRepository.save(review2);
+        diningReviewRepository.save(review3);
     }
 }
