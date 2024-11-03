@@ -24,7 +24,7 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         Restaurant restaurant1 = new Restaurant();
-        restaurant1.setName("The Vegan Spot");
+        restaurant1.setName("The Veggie Spot");
         restaurant1.setZipCode("12345");
         restaurant1.setPeanutScore(4.5);
         restaurant1.setEggScore(4.0);
